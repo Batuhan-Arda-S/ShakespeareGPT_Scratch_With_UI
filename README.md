@@ -66,7 +66,7 @@ GPT-Language-Model/
 - Attention Heads: 6
 - Batch Size: 64
 - Training Iterations: 5000
-- Final Test Loss: **1.76**
+- Final Test Loss: **2.086**
 
 ## Technologies
 
