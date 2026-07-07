@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shakespeare GPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>Shakespeare GPT</h1>
+          <p class="lead">
+            A character-level language model trained on Shakespeare text
+          </p>
+        </div>
+
+        <aside class="model-card" aria-label="Model details">
+          <span>Custom LLM</span>
+          <strong>6-layer GPT</strong>
+          <p>Multi-head self-attention, learned token embeddings, and autoregressive text generation.</p>
+          <div class="specs">
+            <span>750 tokens</span>
+            <span>0.8 temperature</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="workspace" aria-label="Text generation demo">
+        <form class="panel composer" id="generateForm">
+          <div class="section-head">
+            <div class="section-copy">
+              <p>Prompt</p>
+              <span>Write a short opening and let the model continue it.</span>
+            </div>
+            <button type="submit" id="generateButton">Generate</button>
+          </div>
+          <textarea id="prompt" name="prompt" spellcheck="false">ROMEO:</textarea>
+        </form>
+
+        <div class="panel output-card" aria-label="Generated text">
+          <div class="section-head">
+            <div class="section-copy">
+              <p>Generated Text</p>
+              <span>Fresh continuation from your prompt.</span>
+            </div>
+            <div class="head-spacer" aria-hidden="true"></div>
+          </div>
+          <pre id="output"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
