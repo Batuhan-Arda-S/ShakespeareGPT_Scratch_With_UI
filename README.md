@@ -12,6 +12,10 @@ This project was built to gain a deep understanding of how GPT-style language mo
 The model is trained using next-token prediction on Shakespeare's complete works and generates Shakespeare-style text from custom prompts.
 ![Model](model4.png)
 
+## Core AI Model
+
+The web application is powered by a decoder-only GPT-style Transformer implemented from scratch using PyTorch.
+
 ## Model Architecture
 
 Custom decoder-only Transformer architecture including:
