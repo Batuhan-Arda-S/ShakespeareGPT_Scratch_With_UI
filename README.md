@@ -1,6 +1,16 @@
-# ShakespeareGPT — Character-Level Transformer
+# ShakespeareGPT: GPT-Style Language Model with Web UI
 
-A GPT-style decoder-only language model implemented and trained from scratch in PyTorch. This README covers the model, training procedure, and measured checkpoint.
+![ShakespeareGPT browser workspace](docs/assets/shakespeare-gpt-workspace.png)
+
+A GPT-style decoder-only language model implemented and trained from scratch in PyTorch on a character-level Shakespeare text corpus. The trained model is also available through a lightweight Flask browser interface for interactive text generation.
+
+## Project overview
+
+The core of this project is a decoder-only Transformer built to study character tokenization, positional embeddings, causal multi-head attention, Transformer blocks, and autoregressive generation. The browser interface was added later with Codex and Antigravity; the from-scratch model and training work are distinct from that application integration.
+
+Enter a prompt in the web interface to generate Shakespeare-style text with the trained checkpoint.
+
+![Generated text in the web interface](docs/assets/shakespeare-gpt-generated-text.png)
 
 ## Model architecture
 
@@ -46,6 +56,30 @@ No random seed is set in the original training script. The corpus URL points to 
 The included [model.pt](model.pt) is the **final 5,000-iteration checkpoint** from the original training project; the two files have matching SHA-256 hashes. Its metadata records a held-out **test loss of 2.086024811267853** (reported as **2.086**). This is mean next-character cross-entropy over 100 randomly sampled batches from the final 10% of the same corpus. It is not a result on an independent Shakespeare collection.
 
 Checkpoint SHA-256: `c88dfde6690d9743745071ecc5ef10378551c821ebe0e1216d9afe3403e27677`.
+
+## Repository structure
+
+```text
+ShakespeareGPT_Scratch_With_UI/
+├── app.py              # Flask browser application
+├── dataset.py          # Corpus loading, split, and character tokenizer
+├── inference.py        # Text generation pipeline
+├── model.py            # GPT architecture
+├── model.pt            # Included final training checkpoint
+├── train.py            # Original model training loop
+├── paths.py            # Project path configuration
+├── requirements.txt    # Python dependencies
+├── templates/          # Browser page
+├── static/             # CSS and JavaScript
+├── docs/assets/        # README screenshots
+└── README.md
+```
+
+The Flask application uses the included checkpoint for generation. Its browser layer is separate from the model training described above.
+
+## Technologies and features
+
+The model and training code use Python, PyTorch, and CUDA when available. The browser interface uses Flask, HTML, CSS, and JavaScript. Together, the repository includes character-level tokenization, multi-head self-attention, learned positional embeddings, checkpointed training, temperature-controlled autoregressive generation, and browser-based prompt input.
 
 ## Reproduce training
 
