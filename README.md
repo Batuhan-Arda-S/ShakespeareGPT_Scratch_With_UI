@@ -1,102 +1,59 @@
-# ShakespeareGPT: GPT-Style Language Model with Web UI
+# ShakespeareGPT — Character-Level Transformer
 
-![Model](model3.png)
+A GPT-style decoder-only language model implemented and trained from scratch in PyTorch. This README covers the model, training procedure, and measured checkpoint.
 
-A GPT-style decoder-only language model implemented entirely from scratch using PyTorch and trained on the Shakespeare dataset at the character level.
+## Model architecture
 
-The project recreates the core building blocks of modern autoregressive language models, including character tokenization, positional embeddings, multi-head self-attention, transformer blocks, and autoregressive text generation. The trained model is integrated into a lightweight Flask web application for interactive text generation through a browser interface.
+The model uses learned token and positional embeddings, causal multi-head self-attention, pre-normalized Transformer blocks, residual connections, a feed-forward network, and a final language-modeling head. It predicts the next character from the preceding context. The attention operation uses PyTorch's `nn.MultiheadAttention`; no pretrained Transformer weights are used.
 
-## Project Overview
+| Property | Value |
+| --- | ---: |
+| Transformer blocks | 6 |
+| Attention heads | 6 |
+| Embedding dimension | 384 |
+| Maximum context | 256 characters |
+| Vocabulary | 65 characters |
+| Dropout | 0.1 |
+| Trainable parameters | 8,134,721 |
 
-This project was built to gain a deep understanding of GPT-style language models by implementing the complete decoder-only Transformer architecture from scratch instead of relying on high-level libraries.
+The architecture is defined in [model.py](model.py). The parameter count was checked against the saved checkpoint.
 
-The model is trained using next-token prediction on Shakespeare's complete works and can generate Shakespeare-style text from custom prompts through an interactive web interface.
+## Training data
 
-![Web Interface](model4.png)
+[dataset.py](dataset.py) downloads a [Shakespeare text corpus](https://github.com/atilsamancioglu/ShakespeareInput/blob/main/input.txt). The local training copy contains **1,115,394 characters** and has SHA-256 `86c4e6aa9db7c042ec79f339dcb96d42b0075e16b8fc2e86bf0ca57e2dc565ed`. The source is a single text file; this project does not establish that it contains Shakespeare's complete works.
 
-## Model Architecture
+The code builds a character vocabulary and splits token IDs **in order**: the first 90% (1,003,854 characters) for training and the final 10% (111,540 characters) for held-out evaluation. It does not shuffle or split by play.
 
-Custom decoder-only Transformer architecture including:
+## Training configuration
 
-- Character-level tokenizer
-- Token embedding layer
-- Learned positional embeddings
-- Multi-Head Self-Attention
-- Residual connections
-- Layer Normalization
-- Feed Forward Networks (MLP)
-- Stacked Transformer blocks
-- Final language modeling head
+The original training loop is included as [train.py](train.py); it works with this repository's [dataset.py](dataset.py) and [model.py](model.py).
 
-## Training Pipeline
+| Setting | Recorded value |
+| --- | ---: |
+| Optimizer | AdamW |
+| Learning rate | 3 × 10⁻⁴ after a 100-iteration linear warmup |
+| Batch size | 64 sequences |
+| Training iterations | 5,000 |
+| Gradient clipping | Norm 1.0 |
+| Evaluation | Every 500 iterations and at the final iteration |
+| Evaluation sampling | Mean loss over 100 random batches per split |
+| Device | CUDA when available, otherwise CPU |
 
-Implemented modern language model training techniques including:
+No random seed is set in the original training script. The corpus URL points to a branch rather than an immutable revision, so a fresh download may differ from the recorded training copy.
 
-- Character-level next-token prediction
-- Cross Entropy Loss
-- AdamW optimizer
-- Learning rate warmup
-- Gradient clipping
-- Train/Test split evaluation
-- Periodic validation during training
-- CUDA GPU acceleration
-- Model checkpointing
-- Temperature-controlled autoregressive text generation
+## Evaluation result
 
-## Project Structure
+The included [model.pt](model.pt) is the **final 5,000-iteration checkpoint** from the original training project; the two files have matching SHA-256 hashes. Its metadata records a held-out **test loss of 2.086024811267853** (reported as **2.086**). This is mean next-character cross-entropy over 100 randomly sampled batches from the final 10% of the same corpus. It is not a result on an independent Shakespeare collection.
 
-```text
-ShakespeareGPT_Scratch_With_UI/
-│
-├── app.py              # Flask web application
-├── dataset.py          # Dataset loading and character tokenizer
-├── inference.py        # Text generation pipeline
-├── model.py            # GPT model architecture
-├── model.pt            # Trained model weights
-├── paths.py            # Project path configuration
-├── requirements.txt    # Project dependencies
-│
-├── templates/          # HTML templates
-├── static/             # CSS, JavaScript and static assets
-│
-├── model3.png          # Project screenshot
-├── model4.png          # Project screenshot
-├── .gitignore
-└── README.md
+Checkpoint SHA-256: `c88dfde6690d9743745071ecc5ef10378551c821ebe0e1216d9afe3403e27677`.
+
+## Reproduce training
+
+From the repository root, install the Python dependencies and run:
+
+```bash
+python -m pip install -r requirements.txt
+python train.py
 ```
 
-## Results
-
-- Dataset: Shakespeare
-- Language Modeling: Character-level
-- Vocabulary Size: 65 characters
-- Context Length: 256 tokens
-- Embedding Dimension: 384
-- Transformer Layers: 6
-- Attention Heads: 6
-- Batch Size: 64
-- Training Iterations: 5000
-- Final Test Loss: **2.086**
-
-## Technologies
-
-- Python
-- PyTorch
-- Flask
-- HTML
-- CSS
-- JavaScript
-- CUDA
-
-## Features
-
-- GPT-style decoder-only Transformer implemented from scratch
-- Character-level tokenizer
-- Multi-Head Self-Attention
-- Learned positional embeddings
-- Autoregressive text generation
-- Complete training pipeline
-- Model checkpointing
-- GPU-accelerated training
-- Interactive Flask-based web interface
-- Browser-based prompt input and text generation
+If `data/shakespeare.txt` is absent, the script downloads the corpus. It writes a newly trained checkpoint to `checkpoints/model.pt`; the included `model.pt` remains untouched. Compare the downloaded corpus SHA-256 with the value above before comparing metrics. Because the script does not fix random seeds or package versions, an exact loss match is not guaranteed.
